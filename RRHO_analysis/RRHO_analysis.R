@@ -1,0 +1,26 @@
+install.packages(devtools)
+install.packages("devtools")
+library(devtools)
+install_github("RRHO2/RRHO2")
+library(RRHO2)
+library(xlsx)
+library(biomaRt)
+library(tidyverse)
+list.files()
+dorsal_data <- read.table("dorsal_data.csv", sep="\t", header=TRUE)
+ventral_data <- read.table("ventral_data.csv", sep="\t", header=TRUE)
+head(dorsal_data)
+head(ventral_data)
+dorsal <- select(dorsal_data, Gene_name, logfc)
+dorsal <- select(dorsal_data, GeneName, logfc)
+ventral <- select(ventral_data, GeneName, logfc)
+dorsal <- distinct(dorsal, GeneName, .keep_all = TRUE)
+ventral <- distinct(ventral, GeneName, .keep_all = TRUE)
+dorsal_for_rrho <- semi_join(dorsal, ventral, by="GeneName")
+ventral_for_rrho <- semi_join(ventral, dorsal, by="GeneName")
+# To add labels on RRHO2 heatmaps, the RRHO2 function is manually edited. See accomanying text document which contains more general methods..
+trace(RRHO2, edit=TRUE)
+# A directory "rrho_output" must be created for RRHO2 output files, including the heatmaps.
+RRHO2(dorsal_for_rrho, ventral_for_rrho, stepsize = 70, labels = c("Dorsal DG", "Ventral DG"), alternative="split", plots=TRUE, outputdir = "rrho_output", BY=TRUE, method = "hyper", log10.ind = TRUE, boundary=0.05)
+
+

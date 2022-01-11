@@ -1,0 +1,40 @@
+##### RRHO script #####
+
+# Load libraries
+library(dplyr)
+library(RRHO)
+
+# Read in data, filter it and assemble it into the format needed:
+male_data <- read.table("male_high_low_de_data.txt", header=TRUE)
+female_data <- read.table("female_high_low_de_data.txt", header=TRUE)
+male_data <- filter(male_data, !is.na(ensembl_gene_id))
+female_data <- filter(female_data, !is.na(ensembl_gene_id))
+male <- select(male_data, ensembl_gene_id, logFC)
+female <- select(female_data, ensembl_gene_id, logFC)
+male_for_rrho <- semi_join(male, female, by="ensembl_gene_id")
+female_for_rrho <- semi_join(female, male, by="ensembl_gene_id")
+
+# To add custom axes labels, you need to manually alter the RRHO code (see below):
+trace(RRHO, edit=TRUE)
+
+# Run the actual RRHO program. First the "results" directory needs to be created, which is where the results are written.
+RRHO(male_for_rrho, female_for_rrho, labels = c("Male", "Female"), alternative="enrichment", plots=TRUE, outputdir = "results", BY=TRUE)
+
+# (That was for an "enrichment" comparison, for two sided change "enrichment" above to "two.sided".) 
+
+
+# In the RRHO code, alter or add these lines after "trace(RRHO, edit=TRUE)" above:
+image(hypermat.signed, xlab = "", ylab = "", col = jet.colors(100), 
+	axes = FALSE, main = "Rank Rank Hypergeometric Overlap Map", 
+	cex.main = 1.5)
+mtext("Up Low", 1, adj = 0, padj = 0.8)
+mtext("Up High", 1, adj = 1, padj = 0.8)
+mtext("Up Low", 2, adj = 0, padj = -0.8)
+mtext("Up High", 2, adj = 1, padj = -0.8)
+mtext(labels[2], 2, 0.5)
+mtext(labels[1], 1, 0.5)
+
+# To reverse the signs of one of the DE datasets, in the following case male, do this then run RRHO again with negative_male_for_rrho.
+negative_male_for_rrho <- mutate(male_for_rrho, logFC = -logFC)
+
+
