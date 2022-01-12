@@ -47,5 +47,5 @@ for(cell in unique(celltype)){
 	masterttest <- cbind(masterttest, log2FC, adjpval)
 	
 	filename <- paste0(cell, '_tp10k>=0.5_ttest_stats_fdr.csv')
-	write.csv(masterttest, filename, row.names=F)
+	write.csv(masterttest, filename)
 }	
