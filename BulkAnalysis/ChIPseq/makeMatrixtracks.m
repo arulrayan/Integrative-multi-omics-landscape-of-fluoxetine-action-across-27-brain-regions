@@ -79,6 +79,7 @@ sdatamod(:, bi) = convn(datamod(:, bi) , meanwin , 'same') ;
 
 for j = 1:peakro
 peakscore(j,bi) =  sum( datamod(cpeak(j)-5: cpeak(j)+5, bi)) ;
+% maximum height of peak after blurring with 1 Kb mean window
 peakscore1(j,bi) =  max( sdatamod(cpeak(j)-5: cpeak(j)+5, bi)) ;
 end
 
@@ -102,9 +103,12 @@ end
 %ploc2s = ceil( [ data2save(cpeak,1:2)  peakscore1 ] );
 
 dlmwrite('signal2noise' , bssum , 'delimiter' , '\t') ;
-dlmwrite('peakscore' , peakscore , 'delimiter' , '\t' , 'precision' , '%.2f' ) ;
-dlmwrite( 'peakscore1' , peakscore1 , 'delimiter' , '\t' , 'precision' , '%d' )
+dlmwrite('correctScore1' , peakscore , 'delimiter' , '\t' , 'precision' , '%.2f' ) ;
+dlmwrite( 'correcteScore' , peakscore1 , 'delimiter' , '\t' , 'precision' , '%d' )
 
+%%%%%%%%%%%%%%%%%%% the following code is for saving the GC corrected
+%%%%%%%%%%%%%%%%%%% read-counts as custom tracks to visualised in UCSC
+%%%%%%%%%%%%%%%%%%% genome browser
 %  for bi = 1:bedro
 %  
 %  
